@@ -1,4 +1,6 @@
 import 'package:crud_29/add_dialog.dart';
+import 'package:crud_29/database_provider.dart';
+import 'package:crud_29/todo_model.dart';
 import 'package:crud_29/update_dialog.dart';
 import 'package:flutter/material.dart';
 
@@ -11,6 +13,7 @@ class ListViewCrud extends StatefulWidget {
 
 class _ListViewCrudState extends State<ListViewCrud> {
   var list = <String>["Black", "Red", "Green"];
+  DatabaseProvider databaseProvider = DatabaseProvider();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,6 +55,9 @@ class _ListViewCrudState extends State<ListViewCrud> {
         onPressed: () {
           showDialog(context: context, builder: (context) => AddDialog())
               .then((value) {
+            TodoModel todoModel =
+                TodoModel(title: value, description: "This is testing");
+            databaseProvider.insertTodo(todoModel);
             list.add(value);
             setState(() {});
           });
