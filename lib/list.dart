@@ -12,8 +12,23 @@ class ListViewCrud extends StatefulWidget {
 }
 
 class _ListViewCrudState extends State<ListViewCrud> {
-  var list = <String>["Black", "Red", "Green"];
+  // var list = <String>["Black", "Red", "Green"];
   DatabaseProvider databaseProvider = DatabaseProvider();
+  var todoList = <TodoModel>[];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getlist();
+  }
+
+  getlist() async {
+    print("in list 26");
+    todoList.addAll(await databaseProvider.getList());
+    print("list ${todoList.length}");
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,19 +39,21 @@ class _ListViewCrudState extends State<ListViewCrud> {
         title: const Text('List CRUD'),
       ),
       body: ListView.builder(
-          itemCount: list.length,
+          itemCount: todoList.length,
           itemBuilder: (context, index) {
             return Row(
               children: [
-                Expanded(child: Text(list[index])),
+                Expanded(child: Text(todoList[index].title ?? "")),
                 GestureDetector(
                   child: Icon(Icons.edit),
                   onTap: () {
                     showDialog(
                             context: context,
-                            builder: (context) => UpdateDialog(list[index]))
+                            builder: (context) => UpdateDialog(todoList[index]))
                         .then((value) {
-                      list[index] = value;
+                      todoList[index] = value;
+                      databaseProvider.updateTodo(
+                          value, todoList[index].id ?? 0);
                       setState(() {});
                     });
                   },
@@ -44,7 +61,7 @@ class _ListViewCrudState extends State<ListViewCrud> {
                 GestureDetector(
                   child: Icon(Icons.delete),
                   onTap: () {
-                    list.removeAt(index);
+                    todoList.removeAt(index);
                     setState(() {});
                   },
                 ),
@@ -58,7 +75,7 @@ class _ListViewCrudState extends State<ListViewCrud> {
             TodoModel todoModel =
                 TodoModel(title: value, description: "This is testing");
             databaseProvider.insertTodo(todoModel);
-            list.add(value);
+            todoList.add(value);
             setState(() {});
           });
         },
